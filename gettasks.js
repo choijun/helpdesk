@@ -41,7 +41,7 @@ function app() {
       }
 
       // Необходимо создать и настроить фильтр
-      httpreq.get(config.helpdesk.url, options, function(err, res) {
+      httpreq.get(config.helpdesk.getTasks, options, function(err, res) {
         assert.equal(null, err);
         assert.equal(200, res.statusCode);
         resolve(JSON.parse(res.body).Tasks);

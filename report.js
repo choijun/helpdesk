@@ -19,11 +19,6 @@ var mongoDb;
 
 app.set('config', config);
 
-app.get('/report', function(req, res) {
-  emitter.emit('request', {req: req, res: res})
-  // res.send('ok');
-});
-
 function initApp() {
   var connectMongo = new Promise(function(resolve, reject) {
     MongoClient.connect(config.mongo.uri, function(err, db) {
@@ -43,9 +38,23 @@ function initApp() {
   );
 }
 
+app.get('/report', function(req, res) {
+  var tasks = mongoDb.collection('tasks');
+  var cursor = tasks.find({ExecutorIds: config.telegram.ExecutorId.toString()});
+  cursor.each(function(err, task){
+    if(task == null) {
+      res.send('ok');
+      return;
+    } else {
+      // task.
+    }
+  });
+
+
+});
+
 emitter.on('request', function(params){
-  // params.req
-  params.res.send('ok');
+
 
 
 });
