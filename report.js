@@ -2,6 +2,7 @@
 
 var express = require('express'),
     app = express(),
+    bodyParser = require('body-parser'),
 
     _mongoDb = require('mongodb'),
     MongoClient = _mongoDb.MongoClient,
@@ -15,9 +16,10 @@ var express = require('express'),
     config = require('./etc/config.json')
     ;
 
-var mongoDb;
+var mongoDb, tasks;
 
 app.set('config', config);
+app.use(bodyParser.urlencoded({extended: false}));
 
 function initApp() {
   var connectMongo = new Promise(function(resolve, reject) {
@@ -29,6 +31,7 @@ function initApp() {
   connectMongo.then(
     function(db){
       mongoDb = db;
+      tasks = mongoDb.collection('tasks');
       emitter.emit('init', 'mongo');
     },
     function(err){
@@ -38,31 +41,19 @@ function initApp() {
   );
 }
 
-app.get('/report', function(req, res) {
-  var tasks = mongoDb.collection('tasks');
-  var cursor = tasks.find({ExecutorIds: config.telegram.ExecutorId.toString()});
-  cursor.each(function(err, task){
-    if(task == null) {
-      res.send('ok');
-      return;
-    } else {
-      // task.
-    }
+app.post('/report.json', function(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+  var cursor = tasks.find({ExecutorIds: req.body.ExecutorId.toString()});
+  cursor.toArray(function(err, items){
+    assert.equal(null, err);
+    res.send(JSON.stringify(items));
   });
-
-
 });
-
-emitter.on('request', function(params){
-
-
-
-});
-
 
 
 initApp();
 
+// Статика
 app.use(express.static('public'));
 app.listen(config.web.port, config.web.host);
 
