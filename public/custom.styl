@@ -1,0 +1,27 @@
+.fc .fc-event
+  &.task-status
+    &--28 // закрыта
+    &--29 // выполнена
+      background-color: green
+      .task-hours
+        color: green
+    &--30 // отменена
+      background-color: red
+      .task-hours
+        color: red
+
+.task-hours
+  display: inline-block
+  font-weight: bold
+  box-sizing: border-box
+
+  width: 26px
+  height: 26px
+  padding-top: 6px
+
+  text-align: center
+
+  background: #FFF
+  color: #02a8f3
+  border-radius: 20px
+  margin-right: 10px

@@ -1,0 +1,27 @@
+.fc .fc-event.task-status--28,
+.fc .fc-event.task-status--29 {
+  background-color: #008000;
+}
+.fc .fc-event.task-status--28 .task-hours,
+.fc .fc-event.task-status--29 .task-hours {
+  color: #008000;
+}
+.fc .fc-event.task-status--30 {
+  background-color: #f00;
+}
+.fc .fc-event.task-status--30 .task-hours {
+  color: #f00;
+}
+.task-hours {
+  display: inline-block;
+  font-weight: bold;
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  padding-top: 6px;
+  text-align: center;
+  background: #fff;
+  color: #02a8f3;
+  border-radius: 20px;
+  margin-right: 10px;
+}

@@ -17,6 +17,7 @@
   <link rel="stylesheet" type="text/css" href="asset/css/plugins/animate.min.css"/>
   <link rel="stylesheet" type="text/css" href="asset/css/plugins/fullcalendar.min.css"/>
   <link href="asset/css/style.css" rel="stylesheet">
+  <link href="custom.css" rel="stylesheet">
   <!-- end: Css -->
 
   <link rel="shortcut icon" href="asset/img/logomi.png">
@@ -213,19 +214,16 @@
               <div class="panel">
                   <div class="panel-heading"><h3></h3></div>
                   <div class="panel-body">
+                    <!--
                     <div class="col-md-3">
                       <div id='external-events'>
                       <h4>Мои задачи</h4>
-                        <div class='fc-event label'>My Event 1</div>
-                        <div class='fc-event label'>My Event 2</div>
-                        <div class='fc-event label'>My Event 3</div>
-                        <div class='fc-event label'>My Event 4</div>
-                        <div class='fc-event label'>My Event 5</div>
-                        <div class='fc-event label'>My Event 6</div>
+                        <div class="js-tasks-list"></div>
 
                       </div>
                     </div>
-                    <div class="col-md-9">
+                    -->
+                    <div class="col-md-12">
                       <div id='calendar'></div>
                     </div>
 
@@ -870,46 +868,6 @@
 
 <!-- custom -->
 <script src="asset/js/main.js"></script>
-<script type="text/javascript">
-  $(document).ready(function(){
-        $('#external-events .fc-event').each(function() {
-        // store data so the calendar knows to render an event upon drop
-        $(this).data('event', {
-          title: $.trim($(this).text()), // use the element's text as the event title
-          stick: true // maintain when user navigates (see docs on the renderEvent method)
-        });
-
-        // make the event draggable using jQuery UI
-        /*
-        $(this).draggable({
-          zIndex: 999,
-          revert: true,      // will cause the event to go back to its
-          revertDuration: 0  //  original position after the drag
-        });
-        */
-
-      });
-
-
-      $('#calendar').fullCalendar({
-      header: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'month,agendaWeek,agendaDay'
-      },
-      editable: true,
-      droppable: true, // this allows things to be dropped onto the calendar
-      drop: function(date, jsEvent, ui ) {
-
-        // is the "remove after drop" checkbox checked?
-        if ($('#drop-remove').is(':checked')) {
-          // if so, remove the element from the "Draggable Events" list
-          $(this).remove();
-        }
-      }
-    });
-  });
-</script>
 <script src="asset/js/report.js"></script>
 <!-- end: Javascript -->
 </body>
