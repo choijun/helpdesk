@@ -149,7 +149,7 @@
             $('.opener-right-menu').on('click', function(){
             userList();
             $(".user").niceScroll();
-            $(".user ul li").on('click',function(){
+            /*$(".user ul li").on('click',function(){
                 $(".user-list ul").getNiceScroll().remove();
                 $(".user").hide();
                 $(".chatbox").show(1000);
@@ -160,6 +160,7 @@
                 $(".user").show();
                 $(".chatbox").hide(1000);
             });
+            */
 
             $(".line-chart").width("100%");
 
@@ -236,7 +237,7 @@
               top: y+'px',
               left:x+'px',
             }).addClass("animate");
-                
+
             rippler.css({'z-index':9999});
             rippler.animate({
               backgroundColor: "#FF6656",
@@ -249,7 +250,7 @@
                 $("#mimin-mobile-menu-opener span").removeClass("fa-bars").addClass("fa-close").css({"font-size":"2em"});
               });
         }else{
-            
+
                 if(rippler.find(".ink").length == 0) {
                   rippler.append("<div class='ink'></div>");
                 }
@@ -308,8 +309,8 @@
 
     $(".fileupload-v1-btn").on("click",function(){
       var wrapper = $(this).parent("span").parent("div");
-      var path    = wrapper.find($(".fileupload-v1-path"));   
-      $(".fileupload-v1-file").click();   
+      var path    = wrapper.find($(".fileupload-v1-path"));
+      $(".fileupload-v1-file").click();
       $(".fileupload-v1-file").on("change",function(){
           path.attr("placeholder",$(this).val());
           console.log(wrapper);

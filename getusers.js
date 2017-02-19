@@ -1,6 +1,6 @@
 'use strict';
 
-// Получение заявок
+// Получение пользователей... как я люблю копи-пасту... аппетитненько!
 
 var httpntlm = require('httpntlm'),
     httpreq = require('httpreq'),
@@ -17,7 +17,7 @@ var httpntlm = require('httpntlm'),
     config = require('./etc/config')
     ;
 
-var mongoDb, insertTasks, initEvents = [];
+var mongoDb, insertUsers, initEvents = [];
 
 app();
 
@@ -30,7 +30,7 @@ function app() {
     });
   });
 
-  var getApiTasks = new Promise(function(resolve, reject) {
+  var getApiUsers = new Promise(function(resolve, reject) {
     httpntlm.get(config.ntlmOptions, function(err, res) {
       assert.equal(null, err);
       assert.equal(302, res.statusCode);
@@ -40,20 +40,19 @@ function app() {
         headers: {'Accept': 'application/json;q=0.9'}
       }
 
-      // Необходимо создать и настроить фильтр
-      httpreq.get(config.helpdesk.getTasks, options, function(err, res) {
+      httpreq.get(config.helpdesk.getUsers, options, function(err, res) {
         assert.equal(null, err);
         assert.equal(200, res.statusCode);
-        resolve(JSON.parse(res.body).Tasks);
+        resolve(JSON.parse(res.body).Users);
       });
     });
   });
 
-  getApiTasks.then(function(tasks){
-    insertTasks = tasks;
-    emitter.emit('init', 'tasks');
+  getApiUsers.then(function(users){
+    insertUsers = users;
+    emitter.emit('init', 'users');
   }, function(err){
-    console.log('tasks error');
+    console.log('users error');
     process.exit(1);
   });
 
@@ -71,20 +70,17 @@ function app() {
   emitter.on('init', function(type){
     initEvents.push(type);
 
-    if(initEvents.indexOf('tasks') > -1 && initEvents.indexOf('mongo') > -1) {
-      var tasks = mongoDb.collection('tasks');
+    if(initEvents.indexOf('users') > -1 && initEvents.indexOf('mongo') > -1) {
+      var users = mongoDb.collection('users');
 
-      for(var i in insertTasks) {
-        var task = insertTasks[i];
-        task.ExecutorIds = task.ExecutorIds.split(",");
-        task.ExecutorIds = task.ExecutorIds.map(function (val) { return parseInt(val.trim()); });
-        task.ChangedUTC = Date.parse(task.Changed);
+      for(var i in insertUsers) {
+        var user = insertUsers[i];
 
-        tasks.update({Id: task.Id}, {
+        users.update({Id: user.Id}, {
           $currentDate: {
             lastModified: true,
-            "HDTaskUpdate": { $type: "timestamp" }
-          }, $set: task
+            "HDUserUpdate": { $type: "timestamp" }
+          }, $set: user
         }, {upsert: true, multi: false});
       }
 

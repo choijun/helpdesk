@@ -1,46 +1,69 @@
 # Описание
 
-Работа с helpdesk.
+Работа с `helpdesk`.
 
 # Установка
 
-Mongodb:
+## Mongodb:
 
 ```
-db.tasks.createIndex({Id: 1}, {unique: true});
+node install.js
 ```
 
-Bash:
+## Bash:
 
 ```
 mkdir etc && cp etc.dist/config.json etc
 vim etc/config.json
 ```
 
-Повесить на крон:
+Добавить в `report.users` id пользователей для построения отчетов. Заполнить `ntlmOptions` для авторизации.
+
+## Повесить на крон:
 
 ```
-node gettasks.js
+* * * * * node /path/helpdesk/gettasks.js >> /dev/null 2>&1
+* */6 * * * node /path/helpdesk/getusers.js >> /dev/null 2>&1
+* * * * * node /path/helpdesk/taskexpenses.js >> /dev/null 2>&1
+```
+
+## Запустисть демонов:
+
+Веб сервер:
+
+```
+node server.js
+```
+
+Отправка уведомлений:
+
+```
 node telegram.js
-node taskexpenses.js
 ```
 
-Запустисть веб-сервер:
+а еще лучше:
 
 ```
-node report.js
+sudo npm install -g pm2
+pm2 start server.js
+pm2 start telegram.js
 ```
 
-Browser:
+## Browser:
+
 ```
 http://localhost:8080/calendar.html?ExecutorId=14195
 ```
 
-# Скрипты
+# Механика
+
+`gettasks.js` подливает заявки и отправляет в телеграмм новые `telegram.js`, `taskexpenses.js` получает трудоемкость для пользователей `getusers.js`. А `server.js` строит отчеты.
 
 ## gettasks.js
 
-Получение заявок. Первый раз следует указать в фильтре "&pagesize=500", затем настроить расписание и уменьшить до (50), так как будут регистрироваться только последние.
+Получение заявок. Необходимо в интерфейсе `helpdesk` настроить фильтр (исключить по статусу, включить пользователей, etc), который указать в конфиге `helpdesk.getTasks`.
+
+Первый раз следует указать в фильтре `&pagesize=500`, затем настроить расписание и уменьшить до (50), так как будут регистрироваться/обновляться только последние (за счет `sort=Changed%20desc`).
 
 ## taskexpenses.js
 
@@ -50,15 +73,15 @@ http://localhost:8080/calendar.html?ExecutorId=14195
 * оперативное получение
 * не грузить HTTP
 
-Загребается по "расписанию" (в пользу оперативности). Дальше видно будет, стоит ли переделывать на live-версию. Увы, одним запросом к API Intraservice все не вытащить.
+Загребается по "расписанию" (в пользу оперативности получения). Дальше видно будет, стоит ли переделывать на live-версию. Увы, одним запросом к API Intraservice все не вытащить. Но за счет `sort({Changed: -1}).limit(20)` получаем "новости" об измененных задачах. Полагаю, что заявки меняются в меньших объемах, чем переваривает скрипт.
 
 ## telegram.js
 
-Отправка уведомлений о новых задачах в Telegram
+Отправка уведомлений о новых задачах в Telegram. Следует создать бота, и вписать его токен в `telegram.token`.
 
-## report.js
+## server.js
 
-Отчет о задачах в формате JSON
+Отчет о задачах, пользователях в формате JSON, запрашивается JS со страницы.
 
 # Полезные поля для фильтрации
 
@@ -67,13 +90,6 @@ http://localhost:8080/calendar.html?ExecutorId=14195
 * Hours - Трудозатраты в часах
 * Deadline - Дедлайн
 
-# Тестовые ID
-
-* 11184
-* 11273
-* 14195
-
 # TODO
 
 * Получить статусы http://helpdesk/api/taskstatus
-* Получить пользователей http://helpdesk/api/user

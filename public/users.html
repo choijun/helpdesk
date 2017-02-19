@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <script src="asset/js/jquery.min.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function(){
+      var $cont = $('.js-container');
+      $.ajax({
+        url: 'http://helpdesk/api/user?pagesize=10000&page=1',
+        // url: 'http://ip.jsontest.com/',
+        type: 'GET',
+        dataType: 'json'
+      })
+      .done(function(resp) {
+        // console.log(resp);
+        $cont.text(JSON.stringify(resp));
+      })
+      .fail(function() {
+        console.log("error");
+      })
+      .always(function() {
+        console.log("complete");
+      });
+
+    });
+  </script>
+</head>
+<body id="mimin" class="dashboard">
+  <div class="js-container"></div>
+</body>
+</html>

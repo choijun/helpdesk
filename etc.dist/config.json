@@ -1,20 +1,38 @@
 {
   "helpdesk": {
-    "getTasks": "http://helpdesk:80/api/task?filterid=398&page=1&sort=Id%20desc&pagesize=500",
-    "getExpenses": "http://helpdesk:80/api/taskexpenses?taskid={taskid}&pagesize=100&page=1"
+    "getTasks": "http://helpdesk:80/api/task?filterid=398&page=1&sort=Changed%20desc&pagesize=500",
+    "getExpenses": "http://helpdesk:80/api/taskexpenses?taskid={taskid}&pagesize=100&page=1",
+    "getUsers": "http://helpdesk:80/api/user?pagesize=5000&page=1"
   },
   "mongo": {
     "uri": "mongodb://localhost:27017/helpdesk"
   },
   "telegram": {
-    "apiString": "xxxxxx:yyyyyy",
-    "chatId": 9999,
-    "ExecutorId": "11184"
+    "token": "your_bot:token",
+    "checkDelay": "5000"
   },
   "web": {
-    "port": 8080,
-    "host": "127.0.0.1",
-    "ExecutorId": "11184"
+    "port": "8080",
+    "host": "127.0.0.1"
+  },
+  "report": {
+    "users": {
+      "335": {"photo": "asset/users/335.jpg"},
+      "11349": {"photo": "asset/users/11349.jpg"},
+      "11184": {"photo": "asset/users/11184.jpg"},
+      "2342": {"photo": "asset/users/2342.jpg"},
+      "10029": {"photo": "asset/users/10029.jpg"},
+      "325": {"photo": "asset/users/325.jpg"},
+      "8960": {"photo": "asset/users/8960.jpg"},
+      "5842": {"photo": "asset/users/5842.jpg"},
+      "6515": {"photo": "asset/users/6515.jpg"},
+      "331": {"photo": "asset/users/331.jpg"},
+      "11273": {"photo": "asset/users/11273.jpg"},
+      "6548": {"photo": "asset/users/6548.jpg"},
+      "11524": {"photo": "asset/users/11524.jpg"},
+      "14195": {"photo": "asset/users/14195.jpg"},
+      "10123": {"photo": "asset/users/10123.jpg"}
+    }
   },
   "ntlmOptions": {
     "url": "http://helpdesk:80//winauth",

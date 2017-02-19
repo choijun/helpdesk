@@ -83,8 +83,15 @@ function app() {
   });
 
   function getNupdate() {
+    //var cursor = tasks.find({ExecutorIds: 11184}).sort({HDExpUpdate: 1}).limit(10); // {Id: 116080}
+
+
+    // Обновляем все недавно измененные
+    var cursor = tasks.find({}).sort({Changed: -1}).limit(20); // {Id: 116080}
+
+    // Могут быть "пропуски", поэтому периодически надо "обновлять все", но планомерно
     // TODO критерии, например "все открытые" + "закрытые недавно"
-    var cursor = tasks.find(); // {Id: 116080}
+    // var cursor = tasks.find({}).sort({HDExpUpdate: 1}).limit(10); // {Id: 116080}
 
     cursor.each(function(err, task){
       if(task == null) {
@@ -95,6 +102,7 @@ function app() {
         updateExpenses(task.Id);
       }
     });
+
   }
 
   function updateExpenses(taskId) {
@@ -104,7 +112,13 @@ function app() {
       assert.equal(null, err);
       assert.equal(200, res.statusCode);
       var Expenses = {Expenses: JSON.parse(res.body).Expenses};
-      tasks.update({Id: taskId}, {$set: Expenses});
+      tasks.update({Id: taskId}, {
+          $currentDate: {
+            lastModified: true,
+            "HDExpUpdate": { $type: "timestamp" }
+          },
+          $set: Expenses
+        });
       emitter.emit('mongoQuery', -1);
       emitter.emit('closemongo');
     });
