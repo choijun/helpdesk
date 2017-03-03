@@ -1,20 +1,29 @@
 {
   "name": "intraservice",
   "version": "1.0.0",
-  "description": "intraservice telegramm bot",
   "main": "index.js",
+  "description": "Intraservice tools",
+  "keywords": [
+    "helpdesk",
+    "intraservice"
+  ],
   "dependencies": {
+    "body-parser": "^1.16.1",
+    "express": "^4.14.1",
     "httpntlm": "^1.7.3",
-    "mongodb": "^2.2.22"
+    "mongodb": "^2.2.22",
+    "node-telegram-bot-api": "^0.27.0"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "preinstall": "mkdir etc && cp etc.dist/config.json etc && vim etc/config.json",
+    "install": "node scripts/install.js",
+    "start": "node scripts/server.js"
   },
   "repository": {
     "type": "git",
-    "url": ".git"
+    "url": "https://github.com/dbfun/helpdesk.git"
   },
-  "author": "",
+  "author": "Vagun Ilya",
   "license": "ISC"
 }

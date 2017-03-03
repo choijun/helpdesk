@@ -13,7 +13,7 @@ var express = require('express'),
 
     assert = require('assert'),
 
-    config = require('./etc/config.json')
+    config = require('../etc/config.json')
     ;
 
 var mongoDb;
@@ -95,7 +95,7 @@ app.get('/report.json', function(req, res) {
 initApp();
 
 // Статика
-app.use(express.static('public'));
+app.use(express.static('public_html'));
 app.listen(config.web.port, config.web.host);
 
 

@@ -8,6 +8,7 @@
     "uri": "mongodb://localhost:27017/helpdesk"
   },
   "telegram": {
+    "active": "0",
     "token": "your_bot:token",
     "checkDelay": "5000"
   },

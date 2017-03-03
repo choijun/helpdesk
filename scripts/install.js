@@ -12,7 +12,7 @@ var _mongoDb = require('mongodb'),
 
     assert = require('assert'),
 
-    config = require('./etc/config')
+    config = require('../etc/config')
     ;
 
 var mongoDb;

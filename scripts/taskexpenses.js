@@ -14,7 +14,7 @@ var httpntlm = require('httpntlm'),
 
     assert = require('assert'),
 
-    config = require('./etc/config')
+    config = require('../etc/config')
     ;
 
 var mongoDb, tasks, httpApiOptions, initEvents = [], mongoQuery = 0;

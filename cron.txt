@@ -1,0 +1,3 @@
+* * * * * node /usr/src/app/scripts/gettasks.js >> /dev/null 2>&1
+* */6 * * * node /usr/src/app/scripts/getusers.js >> /dev/null 2>&1
+* * * * * node /usr/src/app/scripts/taskexpenses.js >> /dev/null 2>&1

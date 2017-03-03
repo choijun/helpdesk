@@ -4,11 +4,6 @@
 
 # Установка
 
-## Mongodb:
-
-```
-node install.js
-```
 
 ## Bash:
 
@@ -16,9 +11,13 @@ node install.js
 mkdir etc && cp etc.dist/config.json etc
 vim etc/config.json
 ```
-
 Добавить в `report.users` id пользователей для построения отчетов. Заполнить `ntlmOptions` для авторизации.
 
+## Mongodb:
+
+```
+node install.js
+```
 ## Повесить на крон:
 
 ```
