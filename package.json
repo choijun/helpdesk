@@ -2,23 +2,22 @@
   "name": "intraservice",
   "version": "1.0.0",
   "main": "index.js",
-  "description": "Intraservice tools",
+  "description": "Intraservice report server",
   "keywords": [
     "helpdesk",
     "intraservice"
   ],
   "dependencies": {
+    "mongodb": "^2.2.22",
     "body-parser": "^1.16.1",
     "express": "^4.14.1",
     "httpntlm": "^1.7.3",
-    "mongodb": "^2.2.22",
     "node-telegram-bot-api": "^0.27.0"
   },
   "devDependencies": {},
   "scripts": {
-    "preinstall": "mkdir etc && cp etc.dist/config.json etc && vim etc/config.json",
     "install": "node scripts/install.js",
-    "start": "node scripts/server.js"
+    "start": "/bin/bash start.sh"
   },
   "repository": {
     "type": "git",

@@ -1,57 +1,51 @@
 # Описание
 
-Работа с `helpdesk`.
+Intraservice report server.
 
-# Установка
-
-
-## Bash:
+# Установка и запуск
 
 ```
-mkdir etc && cp etc.dist/config.json etc
-vim etc/config.json
-```
-Добавить в `report.users` id пользователей для построения отчетов. Заполнить `ntlmOptions` для авторизации.
-
-## Mongodb:
-
-```
-node install.js
-```
-## Повесить на крон:
-
-```
-* * * * * node /path/helpdesk/gettasks.js >> /dev/null 2>&1
-* */6 * * * node /path/helpdesk/getusers.js >> /dev/null 2>&1
-* * * * * node /path/helpdesk/taskexpenses.js >> /dev/null 2>&1
+mkdir etc && cp etc.dist/config.json etc && vim etc/config.json
 ```
 
-## Запустисть демонов:
-
-Веб сервер:
-
-```
-node server.js
-```
-
-Отправка уведомлений:
+* `helpdesk` - указать актуальные адреса Intraservice
+* `mongo` - подключение к mongodb
+* `telegram` - token (опционально) и выставить `"active": "1"`
+* `web` - параметры веб-сервера
+* `report.users` - `id` пользователей для построения отчетов
+* `ntlmOptions` - авторизация
 
 ```
-node telegram.js
+npm install
 ```
 
-а еще лучше:
+Повесить на крон:
+
+```
+* * * * * node /path/scripts/gettasks.js >> /dev/null 2>&1
+* */6 * * * node /path/scripts/getusers.js >> /dev/null 2>&1
+* * * * * node /path/scripts/taskexpenses.js >> /dev/null 2>&1
+```
+
+```
+node start
+```
+
+Альтернативный запуск:
 
 ```
 sudo npm install -g pm2
-pm2 start server.js
-pm2 start telegram.js
+pm2 start scripts/server.js
+pm2 start scripts/telegram.js
 ```
 
-## Browser:
+[Открыть в браузере](http://localhost:8080/calendar.html?ExecutorId=14195)
+
+# Через Docker
 
 ```
-http://localhost:8080/calendar.html?ExecutorId=14195
+mkdir etc && cp etc.dist/config.json etc && vim etc/config.json
+docker build --tag helpdesk .
 ```
 
 # Механика

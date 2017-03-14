@@ -91,11 +91,8 @@ app.get('/report.json', function(req, res) {
 
 });
 
-
 initApp();
 
 // Статика
 app.use(express.static('public_html'));
-app.listen(config.web.port, config.web.host);
-
-
+app.listen(config.web.port);
