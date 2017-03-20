@@ -2,8 +2,7 @@
 
 // Получение пользователей... как я люблю копи-пасту... аппетитненько!
 
-var httpntlm = require('httpntlm'),
-    httpreq = require('httpreq'),
+var helpdeskapi = require('./lib/helpdeskapi'),
 
     _mongoDb = require('mongodb'),
     MongoClient = _mongoDb.MongoClient,
@@ -23,37 +22,21 @@ app();
 
 function app() {
 
+  helpdeskapi.set('config', config.ntlmOptions).connect().then(function(getData){
+    getData(config.helpdesk.getUsers, function(data){
+      insertUsers = data.Users;
+      emitter.emit('init', 'users');
+    });
+  }, function(err){
+    console.log('Intraservice connection error');
+    process.exit(1);
+  });
+
   var connectMongo = new Promise(function(resolve, reject) {
     MongoClient.connect(config.mongo.uri, function(err, db) {
       assert.equal(null, err);
       resolve(db);
     });
-  });
-
-  var getApiUsers = new Promise(function(resolve, reject) {
-    httpntlm.get(config.ntlmOptions, function(err, res) {
-      assert.equal(null, err);
-      assert.equal(302, res.statusCode);
-
-      var options = {
-        cookies: res.headers['set-cookie'],
-        headers: {'Accept': 'application/json;q=0.9'}
-      }
-
-      httpreq.get(config.helpdesk.getUsers, options, function(err, res) {
-        assert.equal(null, err);
-        assert.equal(200, res.statusCode);
-        resolve(JSON.parse(res.body).Users);
-      });
-    });
-  });
-
-  getApiUsers.then(function(users){
-    insertUsers = users;
-    emitter.emit('init', 'users');
-  }, function(err){
-    console.log('users error');
-    process.exit(1);
   });
 
   connectMongo.then(
@@ -89,4 +72,3 @@ function app() {
   });
 
 }
-

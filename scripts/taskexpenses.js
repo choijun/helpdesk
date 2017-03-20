@@ -2,8 +2,7 @@
 
 // Получение трудозатрат
 
-var httpntlm = require('httpntlm'),
-    httpreq = require('httpreq'),
+var helpdeskapi = require('./lib/helpdeskapi'),
 
     _mongoDb = require('mongodb'),
     MongoClient = _mongoDb.MongoClient,
@@ -17,11 +16,19 @@ var httpntlm = require('httpntlm'),
     config = require('../etc/config')
     ;
 
-var mongoDb, tasks, httpApiOptions, initEvents = [], mongoQuery = 0;
+var mongoDb, tasks, apiGetData, initEvents = [], mongoQuery = 0;
 
 app();
 
 function app() {
+
+  helpdeskapi.set('config', config.ntlmOptions).connect().then(function(getData){
+    apiGetData = getData;
+    emitter.emit('init', 'auth');
+  }, function(err){
+    console.log('Intraservice connection error');
+    process.exit(1);
+  });
 
   var connectMongo = new Promise(function(resolve, reject) {
     MongoClient.connect(config.mongo.uri, function(err, db) {
@@ -30,17 +37,6 @@ function app() {
     });
   });
 
-  var helpdeskAuth = new Promise(function(resolve, reject) {
-    httpntlm.get(config.ntlmOptions, function(err, res) {
-      assert.equal(null, err);
-      assert.equal(302, res.statusCode);
-
-      resolve({
-        cookies: res.headers['set-cookie'],
-        headers: {'Accept': 'application/json;q=0.9'}
-      });
-    });
-  });
 
   connectMongo.then(
     function(db){
@@ -49,17 +45,6 @@ function app() {
     },
     function(err){
       console.log('mongo error');
-      process.exit(1);
-    }
-  );
-
-  helpdeskAuth.then(
-    function(options){
-      httpApiOptions = options;
-      emitter.emit('init', 'auth');
-    },
-    function(err){
-      console.log('auth error');
       process.exit(1);
     }
   );
@@ -108,10 +93,9 @@ function app() {
   function updateExpenses(taskId) {
 
     var uri = config.helpdesk.getExpenses.replace('{taskid}', taskId);
-    httpreq.get(uri, httpApiOptions, function(err, res) {
-      assert.equal(null, err);
-      assert.equal(200, res.statusCode);
-      var Expenses = {Expenses: JSON.parse(res.body).Expenses};
+    apiGetData(uri, function (data) {
+
+      var Expenses = {Expenses: data.Expenses};
       tasks.update({Id: taskId}, {
           $currentDate: {
             lastModified: true,
@@ -121,9 +105,9 @@ function app() {
         });
       emitter.emit('mongoQuery', -1);
       emitter.emit('closemongo');
+
     });
 
   }
 
 }
-
