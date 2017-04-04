@@ -15,106 +15,60 @@
     }
   };
 
-  var ExecutorId = getUrlParameter('ExecutorId');
+  var ExecutorId;
 
   $(document).ready(function(){
     var $userName = $('.js-username'),
         $userPhoto = $('.js-userphoto'),
         $usersList = $('.js-userslist'),
-        userListInitialized = false
+        $calendar = $('#calendar'),
+        users = {}
         ;
-    initCalendar();
-    loadPage(ExecutorId);
+
+    initUserList();
+
+    window.onpopstate = function(event) {
+      if(event.state === null) return;
+      if(event.state.userID === null) return;
+      $calendar.trigger('change-user', event.state);
+    };
 
     $('body').on('click', '.js-changeuser', function(e){
-      loadPage($(this).attr('data-id'));
+      var state = {userID: $(this).attr('data-id')};
+      $calendar.trigger('change-user', state);
+      history.pushState(state, '', 'calendar.html?ExecutorId=' + state.userID);
     });
 
+    $calendar.on('change-user', function(event, state){
+      ExecutorId = state.userID;
+      var curUser = users[ExecutorId];
 
-    function loadPage(ExecutorId) {
-      $.ajax({
-        url: "report.json",
-        method: 'GET',
+      $('.js-changeuser').removeClass('online').filter("[data-id='" + ExecutorId + "']").addClass('online');
+      $userName.html(curUser.Name);
+      $userPhoto.attr('src', curUser.photo);
+
+      $calendar.fullCalendar('removeEventSources');
+      $calendar.fullCalendar('removeEvents');
+      $calendar.fullCalendar('addEventSource', getEvents());
+    });
+
+    function getEvents() {
+      // @see https://fullcalendar.io/docs/event_data/events_json_feed/
+      return {
+        url: '/report.json',
+        type: 'GET',
         data: {
           ExecutorId: ExecutorId
         },
-        cache: false,
-        dataType: 'json',
-        error: function(){
-          $('#calendar').html('Упс, данные для отчета не получены');
-        },
-        success: function(resp) {
-          var curUser = resp.users[ExecutorId];
-
-          $userName.html(curUser.Name)
-          $userPhoto.attr('src', curUser.photo);
-
-          initUserList(resp);
-
-
-
-          // var $tasksList = $('.js-tasks-list');
-
-          $('#calendar').fullCalendar('removeEvents');
-
-          for(var i in resp.tasks) {
-            var task = resp.tasks[i];
-
-            // $tasksList.append("<div class='fc-event' style='margin-bottom:5px; padding: 5px; font-size:14px;'>[" + task.Id + '] ' +task.Name + "</div>");
-
-            if(typeof task.Expenses !== 'undefined' && task.Expenses.length) {
-
-              for(var i2 in task.Expenses) {
-                var expense = task.Expenses[i2];
-                if(expense.UserId != ExecutorId) continue;
-
-                var expHours = Math.round(expense.Minutes / 6) / 10;
-                var event = {
-                  title: task.Name,
-                  start: expense.Date.substr(0,10),
-                  className: 'task-status--' + task.StatusId,
-                  data: {
-                    url: 'http://helpdesk/Task/View/' + task.Id,
-                    expHours: expHours
-                  }
-                };
-
-                $('#calendar').fullCalendar('renderEvent', event);
-              }
-            }
-
-          }
-          // console.log(events);
-          //
-
-          console.log($('#calendar').fullCalendar( 'clientEvents'));
-          $('#calendar').fullCalendar('render');
-
-          // $('#calendar').fullCalendar( 'renderEvent', {title: 'test', start: '2017-02-01'} );
-
-          /*
-          $('#external-events .js-tasks-list .fc-event').each(function() {
-            // store data so the calendar knows to render an event upon drop
-            $(this).data('event', {
-              title: $.trim($(this).text()), // use the element's text as the event title
-              stick: true // maintain when user navigates (see docs on the renderEvent method)
-            });
-
-            // make the event draggable using jQuery UI
-
-            $(this).draggable({
-              zIndex: 999,
-              revert: true,      // will cause the event to go back to its
-              revertDuration: 0  //  original position after the drag
-            });
-          });*/
-
+        error: function() {
+          $calendar.html('<p>Упс, события не получены!</p>');
         }
-      });
+      }
     }
 
+
     function initCalendar() {
-      $('#calendar').fullCalendar({
+      $calendar.fullCalendar({
         header: {
           left: 'prev,next today',
           center: 'title',
@@ -127,39 +81,49 @@
         monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
         locale: 'ru',
         editable: false,
-        droppable: true, // this allows things to be dropped onto the calendar
-        drop: function(date, jsEvent, ui ) {
-          // is the "remove after drop" checkbox checked?
-          if ($('#drop-remove').is(':checked')) {
-            // if so, remove the element from the "Draggable Events" list
-            $(this).remove();
-          }
-        },
+        droppable: false, // this allows things to be dropped onto the calendar
         eventRender: function(event, element) {
           element.html('<span class="task-hours">' + event.data.expHours +'</span>' + event.title);
+        },
+        eventClick: function(calEvent, jsEvent, view) {
+          var win = window.open(calEvent.data.url, '_blank');
+        },
+      });
+      _ExecutorId = getUrlParameter('ExecutorId');
+
+      if(typeof _ExecutorId !== 'undefined') {
+        $calendar.trigger('change-user', {userID: _ExecutorId});
+      }
+    }
+
+    function initUserList() {
+      $.ajax({
+        url: "users.json",
+        method: 'GET',
+        cache: false,
+        dataType: 'json',
+        error: function(){
+          $usersList.html('<li>Упс, пользователи не получены</li>');
+        },
+        success: function(resp) {
+          users = resp.users;
+          var keys = Object.keys(users).sort(function(a,b){return users[a].Name > users[b].Name ? 1: -1});
+
+          keys.forEach(function(i){
+            var user = users[i];
+            var $userHtml = $('<li class="js-changeuser" data-id="' + user.Id + '"><img src="' + user.photo + '" alt="">'
+                +'<div class="name"><h5><b>' + user.Name + '</b></h5></div></li>');
+            $usersList.append($userHtml);
+          });
+
+          initCalendar();
         }
       });
     }
 
 
-    function initUserList(resp) {
-      if(userListInitialized) return;
-      userListInitialized = true;
-      var keys = Object.keys(resp.users).sort(function(a,b){return resp.users[a].Name > resp.users[b].Name ? 1: -1});
-
-      keys.forEach(function(i){
-        var user = resp.users[i];
-        $usersList.append('<li class="js-changeuser online" data-id="' + user.Id + '"><img src="' + user.photo + '" alt="">'
-            +'<div class="name"><h5><b>' + user.Name + '</b></h5></div></li>');
-      });
-    }
-
-
-
-
 
   });
-
 
 
 })(jQuery);

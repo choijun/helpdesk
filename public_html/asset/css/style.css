@@ -18,7 +18,6 @@ a:hover {
   -o-text-decoration: none;
   text-decoration: none;
   color: #2196F3;
-  font-weight: bold;
 }
 
 input:focus,
@@ -290,7 +289,7 @@ p.quote{
    padding-left: 10px;
    position: absolute;
  }
- 
+
  .product-price-bottom{
    top: 49%;
  }
@@ -381,7 +380,7 @@ p.quote{
     }
 
     .search-v1 #search-v1-images{position: absolute;}
-   
+
     .search-v1 #search-v1-images .post { height: 100px; background: cyan; margin-bottom: 20px; }
     .search-v1 #search-v1-images .tall { height: 200px; }
 }
@@ -390,7 +389,7 @@ p.quote{
 
 /*start: article v1*/
   .article-v1{}
-    .article-v1 .article-v1-body 
+    .article-v1 .article-v1-body
     {
       padding: 100px;
       padding-top: 0px;
@@ -436,7 +435,7 @@ p.quote{
   padding-top: 50px;
   margin-top: 80px;
   color: #5C5757;
-} 
+}
 
 .invoice .invoice-v1-content table td,.invoice .invoice-v1-content table th{
   padding: 20px !important;
@@ -498,8 +497,8 @@ p.quote{
     box-shadow: 0 2px 5px 0 rgba(239, 235, 235, 0.16), 0 2px 10px 0 rgba(72, 70, 70, 0.12);
   }
   .boxed #content .col-md-12{padding-right: 0px !important;}
-  .boxed #content .panel{display: table;width: 100%;} 
-  .boxed .panel{box-shadow: none !important;}  
+  .boxed #content .panel{display: table;width: 100%;}
+  .boxed .panel{box-shadow: none !important;}
 
 /*dashboard top navigation*/
 
@@ -5709,7 +5708,7 @@ ul li a:focus {
    opacity: 1;
    filter: alpha(opacity=100);
  }
- to {      
+ to {
    -webkit-opacity: 1;
    -moz-opacity: 1;
    -ms-opacity: 1;
@@ -6347,16 +6346,16 @@ ul li a:focus {
 
 @media only screen and (max-width: 800px) {
   .profile-v1 .profile-v1-wrapper{padding: 0px !important;}
-  .responsive-table table, 
-  .responsive-table thead, 
-  .responsive-table tbody, 
-  .responsive-table th, 
-  .responsive-table td, 
-  .responsive-table tr { 
-    display: block !important; 
+  .responsive-table table,
+  .responsive-table thead,
+  .responsive-table tbody,
+  .responsive-table th,
+  .responsive-table td,
+  .responsive-table tr {
+    display: block !important;
   }
 
-  .responsive-table thead tr { 
+  .responsive-table thead tr {
     position: absolute !important;
     top: -9999px !important;
     left: -9999px !important;
@@ -6364,21 +6363,21 @@ ul li a:focus {
 
   .responsive-table tr { border: 1px solid #ccc !important; }
 
-  .responsive-table td { 
+  .responsive-table td {
     border: none !important;
-    border-bottom: 1px solid #eee !important; 
+    border-bottom: 1px solid #eee !important;
     position: relative !important;
-    padding-left: 10% !important; 
+    padding-left: 10% !important;
     white-space: normal !important;
     text-align:left !important;
   }
 
-  .responsive-table td:before { 
+  .responsive-table td:before {
     position: absolute !important;
     top: 6px !important;
     left: 6px !important;
-    width: 45% !important; 
-    padding-right: 10px; 
+    width: 45% !important;
+    padding-right: 10px;
     white-space: nowrap;
     text-align:left;
     font-weight: bold;
@@ -6401,7 +6400,7 @@ ul li a:focus {
     width: 15px;
     height: 15px;
   }
-  
+
   #quote-carousel .carousel-indicators li.active {
     margin: 0px 5px;
     width: 20px;
@@ -6418,7 +6417,7 @@ ul li a:focus {
     padding-top: 10px !important;
   }
   .user-nav .dropdown{
-    margin-top: -4px !important; 
+    margin-top: -4px !important;
   }
   .user-nav .user-dropdown{
     position: absolute !important;
@@ -6454,7 +6453,7 @@ ul li a:focus {
 }
 
 
-@media only screen and (max-width: 479px) { 
+@media only screen and (max-width: 479px) {
   .mail-right-tool li{padding: 5px !important;}
   .fc-right{display: none;}
   .fc-left{margin-bottom: 20px;float: right !important;}

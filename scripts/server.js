@@ -41,54 +41,97 @@ function initApp() {
 }
 
 app.get('/report.json', function(req, res) {
+
   var ExecutorId = parseInt(req.query.ExecutorId);
   assert(ExecutorId > 0);
 
   var emitter = new EventEmitter();
   var tasks = mongoDb.collection('tasks');
-  var users = mongoDb.collection('users');
-  var responseEvents = [], taskItems, userItems = {}, user;
+  var taskItems = [];
 
   emitter.on('response', function(type){
-    responseEvents.push(type);
-    if(responseEvents.indexOf('tasks') > -1 && responseEvents.indexOf('users') > -1) {
-      res.setHeader('Content-Type', 'application/json');
-      res.send(JSON.stringify(
-        {
-          tasks: taskItems,
-          users: userItems
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(taskItems));
+  });
+
+  // {ExecutorIds: ExecutorId},
+  var filter = {
+    Expenses: {
+      $elemMatch: {
+        UserId: ExecutorId,
+        Date: {
+          $gte: req.query.start + 'T00:00:00',
+          $lte: req.query.end + 'T23:59:59'
         }
-      ));
+      },
     }
-  });
+  };
 
+  // console.log(JSON.stringify(filter, null, 4));
 
+  var cursor = tasks.find(filter, {Created: 1, Creator: 1, Expenses: 1, ExecutorIds: 1, Name: 1, Id: 1, StatusId: 1, TypeId: 1});
 
-  var cursor = tasks.find(
-    {ExecutorIds: ExecutorId},
-    {Created: 1, Creator: 1, Expenses: 1, ExecutorIds: 1, Name: 1, Id: 1, StatusId: 1, TypeId: 1}
-  );
-
-  cursor.toArray(function(err, items){
-    taskItems = items;
-    emitter.emit('response', 'tasks');
+  cursor.toArray(function(err, tasks){
     assert.equal(null, err);
+    taskItems = [];
+    for(var i in tasks) {
+      var task = tasks[i];
+
+      if(typeof task.Expenses !== 'undefined' && task.Expenses.length) {
+
+        for(var i2 in task.Expenses) {
+          var expense = task.Expenses[i2];
+          if(expense.UserId != ExecutorId) continue;
+
+          var expHours = Math.round(expense.Minutes / 6) / 10;
+          var event = {
+            title: task.Name,
+            start: expense.Date.substr(0,10),
+            className: 'task-status--' + task.StatusId,
+            data: {
+              url: config.helpdesk.taskUri.replace('{taskid}', task.Id),
+              expHours: expHours
+            }
+          };
+
+          taskItems.push(event);
+        }
+      }
+
+    }
+
+
+
+
+    emitter.emit('response');
   });
 
+});
 
-  var usersIds = Object.keys(config.report.users).map(function (val) { return parseInt(val); });
 
-  var cursor2 = users.find({Id: {$in: usersIds}});
+app.get('/users.json', function(req, res) {
+  var emitter = new EventEmitter();
+  var users = mongoDb.collection('users');
+  var userItems = {};
 
-  cursor2.each(function(err, user){
+  emitter.on('response', function(){
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify({users: userItems}));
+  });
+
+  var usersIDs = Object.keys(config.report.users).map(function (val) { return parseInt(val); });
+
+  var cursor = users.find({Id: {$in: usersIDs}});
+
+  cursor.each(function(err, user){
     if(user == null) {
-      emitter.emit('response', 'users');
+      emitter.emit('response');
     } else {
+      // сливаем параметры из конфига с параметрами из БД
       user = Object.assign(config.report.users[user.Id], user);
       userItems[user.Id] = user;
     }
   });
-
 });
 
 initApp();

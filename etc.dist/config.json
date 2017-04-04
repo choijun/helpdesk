@@ -2,7 +2,8 @@
   "helpdesk": {
     "getTasks": "http://helpdesk:80/api/task?filterid=398&page=1&sort=Changed%20desc&pagesize=500",
     "getExpenses": "http://helpdesk:80/api/taskexpenses?taskid={taskid}&pagesize=100&page=1",
-    "getUsers": "http://helpdesk:80/api/user?pagesize=5000&page=1"
+    "getUsers": "http://helpdesk:80/api/user?pagesize=5000&page=1",
+    "taskUri": "http://helpdesk/Task/View/{taskid}"
   },
   "mongo": {
     "uri": "mongodb://localhost:27017/helpdesk"
