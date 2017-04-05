@@ -35,6 +35,10 @@ function connect() {
 function getData(uri, callback) {
   httpreq.get(uri, options, function(err, res) {
     assert.equal(null, err);
+    if(res.statusCode === 400) {
+      callback(null); // удален
+      return;
+    }
     assert.equal(200, res.statusCode);
     callback(JSON.parse(res.body));
   });

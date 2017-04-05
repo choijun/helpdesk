@@ -94,15 +94,16 @@ function app() {
 
     var uri = config.helpdesk.getExpenses.replace('{taskid}', taskId);
     apiGetData(uri, function (data) {
-
-      var Expenses = {Expenses: data.Expenses};
-      tasks.update({Id: taskId}, {
-          $currentDate: {
-            lastModified: true,
-            "HDExpUpdate": { $type: "timestamp" }
-          },
-          $set: Expenses
-        });
+      if(data !== null) {
+          var Expenses = {Expenses: data.Expenses};
+          tasks.update({Id: taskId}, {
+            $currentDate: {
+              lastModified: true,
+              "HDExpUpdate": { $type: "timestamp" }
+            },
+            $set: Expenses
+          });
+      }
       emitter.emit('mongoQuery', -1);
       emitter.emit('closemongo');
 
