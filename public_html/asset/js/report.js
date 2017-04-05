@@ -22,7 +22,8 @@
         $userPhoto = $('.js-userphoto'),
         $usersList = $('.js-userslist'),
         $calendar = $('#calendar'),
-        users = {}
+        users = {},
+        eventsDateMinutes = {}
         ;
 
     initUserList();
@@ -57,6 +58,11 @@
       $calendar.fullCalendar('addEventSource', getEvents());
     });
 
+    $calendar.on('day-calc', function(event, data) {
+      var dateName = data.date.format('YYYY-MM-DD');
+      data.cell.html('<div class="js-day-info dayinfo" data-date="' + dateName + '"></div>')
+    });
+
     function getEvents() {
       // @see https://fullcalendar.io/docs/event_data/events_json_feed/
       return {
@@ -64,6 +70,33 @@
         type: 'GET',
         data: {
           ExecutorId: ExecutorId
+        },
+        success: function(resp){
+          // агрегируем трудозатраты за день
+          $('.js-day-info').html('');
+          eventsDateMinutes = {};
+          if(resp.length) {
+
+            for(var i in resp) {
+              var dayEvent = resp[i];
+              if(typeof eventsDateMinutes[dayEvent.start] === 'undefined') {
+                eventsDateMinutes[dayEvent.start] = 0;
+              }
+              eventsDateMinutes[dayEvent.start] += dayEvent.data.expMinutes;
+            }
+
+            for(var dateName in eventsDateMinutes) {
+              var $dateCell = $('.js-day-info[data-date="' + dateName + '"]');
+              if($dateCell.length) {
+                var hours = Math.round(eventsDateMinutes[dateName] / 0.6) / 100;
+                $dateCell.html('<span class="totaltime">' + hours + '</span>');
+              }
+            }
+          }
+
+
+
+
         },
         error: function() {
           $calendar.html('<p>Упс, события не получены!</p>');
@@ -86,6 +119,9 @@
         monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
         locale: 'ru',
         editable: false,
+        dayRender: function(date, cell){
+          $calendar.trigger('day-calc', {date: date, cell: cell});
+        },
         droppable: false, // this allows things to be dropped onto the calendar
         eventRender: function(event, element) {
           element.html('<span class="task-hours">' + event.data.expHours +'</span>' + event.title);

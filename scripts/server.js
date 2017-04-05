@@ -83,14 +83,15 @@ app.get('/report.json', function(req, res) {
           var expense = task.Expenses[i2];
           if(expense.UserId != ExecutorId) continue;
 
-          var expHours = Math.round(expense.Minutes / 6) / 10;
+          var expHours = Math.round(expense.Minutes / 0.6) / 100;
           var event = {
             title: task.Name,
             start: expense.Date.substr(0,10),
             className: 'task-status task-status--' + task.StatusId,
             data: {
               url: config.helpdesk.taskUri.replace('{taskid}', task.Id),
-              expHours: expHours
+              expHours: expHours,
+              expMinutes: expense.Minutes
             }
           };
 
