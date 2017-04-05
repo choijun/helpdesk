@@ -1,3 +1,6 @@
+.fc .fc-event.task-status {
+  background-color: #02a8f3;
+}
 .fc .fc-event.task-status--28,
 .fc .fc-event.task-status--29 {
   background-color: #008000;
@@ -7,10 +10,22 @@
   color: #008000;
 }
 .fc .fc-event.task-status--30 {
-  background-color: #f00;
+  background-color: #00c800;
 }
 .fc .fc-event.task-status--30 .task-hours {
   color: #f00;
+}
+.fc .fc-event.task-status:hover {
+  transition: all 0.15s ease-out 0s;
+  cursor: pointer;
+  background-color: rgba(2,168,243,0.7);
+}
+.fc .fc-event.task-status:hover.task-status--28,
+.fc .fc-event.task-status:hover.task-status--29 {
+  background-color: rgba(0,128,0,0.7);
+}
+.fc .fc-event.task-status:hover.task-status--30 {
+  background-color: rgba(0,200,0,0.7);
 }
 .task-hours {
   display: inline-block;
@@ -24,4 +39,8 @@
   color: #02a8f3;
   border-radius: 20px;
   margin-right: 10px;
+}
+td.fc-event-container {
+  padding: 5px !important;
+  border: none !important;
 }

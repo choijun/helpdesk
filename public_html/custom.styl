@@ -1,14 +1,26 @@
+// todo add mixins for CSS3
 .fc .fc-event
   &.task-status
+    background-color: rgba(2, 168, 243, 1)
     &--28 // закрыта
     &--29 // выполнена
-      background-color: green
+      background-color: rgba(0, 128, 0, 1)
       .task-hours
         color: green
     &--30 // отменена
-      background-color: red
+      background-color: rgba(0, 200, 0, 1)
       .task-hours
         color: red
+    &:hover
+      transition: all 0.15s ease-out 0s
+      cursor: pointer
+      background-color: rgba(2, 168, 243, 0.7)
+      &.task-status
+        &--28 // закрыта
+        &--29 // выполнена
+          background-color: rgba(0, 128, 0, 0.7)
+        &--30
+          background-color: rgba(0, 200, 0, 0.7)
 
 .task-hours
   display: inline-block
@@ -25,3 +37,7 @@
   color: #02a8f3
   border-radius: 20px
   margin-right: 10px
+
+td.fc-event-container
+  padding: 5px !important
+  border: none !important

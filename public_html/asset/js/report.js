@@ -27,6 +27,11 @@
 
     initUserList();
 
+    $('#myonoffswitch1').on('change', function(){
+      var isHideHolidays = $(this).is(':checked');
+      $calendar.fullCalendar('option', 'hiddenDays', isHideHolidays ? [ 0, 6 ] : []);
+    });
+
     window.onpopstate = function(event) {
       if(event.state === null) return;
       if(event.state.userID === null) return;
@@ -55,7 +60,7 @@
     function getEvents() {
       // @see https://fullcalendar.io/docs/event_data/events_json_feed/
       return {
-        url: '/report.json',
+        url: 'report.json',
         type: 'GET',
         data: {
           ExecutorId: ExecutorId

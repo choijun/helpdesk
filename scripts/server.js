@@ -87,7 +87,7 @@ app.get('/report.json', function(req, res) {
           var event = {
             title: task.Name,
             start: expense.Date.substr(0,10),
-            className: 'task-status--' + task.StatusId,
+            className: 'task-status task-status--' + task.StatusId,
             data: {
               url: config.helpdesk.taskUri.replace('{taskid}', task.Id),
               expHours: expHours
