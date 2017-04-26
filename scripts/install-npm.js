@@ -1,6 +1,6 @@
 'use strict';
 
-// Установка приложения
+// Установка приложения через npm
 // Создание индексов mongodb, etc
 
 var _mongoDb = require('mongodb'),

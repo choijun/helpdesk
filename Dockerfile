@@ -14,7 +14,7 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 COPY . /usr/src/app/
 
-RUN bash -c "service mongodb start && cat scripts/mongo-make-ind.js | mongo `cat etc/config.json | jq .mongo.dockerDB -r` && npm install && npm install -g pm2"
+RUN bash -c "service mongodb start && cat scripts/install-docker.js | mongo `cat etc/config.json | jq .mongo.dockerDB -r` && npm install && npm install -g pm2"
 
 RUN crontab < /usr/src/app/cron.txt
 CMD [ "/bin/bash", "start.sh", "docker" ]

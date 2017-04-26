@@ -252,6 +252,3 @@ function app() {
 
 
 app();
-
-
-

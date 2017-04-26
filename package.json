@@ -8,15 +8,16 @@
     "intraservice"
   ],
   "dependencies": {
-    "mongodb": "^2.2.22",
     "body-parser": "^1.16.1",
     "express": "^4.14.1",
     "httpntlm": "^1.7.3",
+    "libxmljs": "^0.18.4",
+    "mongodb": "^2.2.22",
     "node-telegram-bot-api": "^0.27.0"
   },
   "devDependencies": {},
   "scripts": {
-    "install": "node scripts/install.js",
+    "install": "node scripts/install-npm.js",
     "start": "/bin/bash start.sh"
   },
   "repository": {
