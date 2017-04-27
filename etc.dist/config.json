@@ -4,8 +4,7 @@
       "active": "1",
       "uri": "http://helpdesk:80/api/task?filterid=398&page=1&sort=Changed%20desc&pagesize={limit}",
       "checkDelay" : "10000",
-      "bigLimit": "500",
-      "smallLimit": "20"
+      "maxLimit": "20"
     },
     "getExpenses": {
       "active": "1",

@@ -2,6 +2,8 @@
 
 // Менеджер задач
 
+// TODO сделать механизм против сбоев сети/helpdesk
+
 var helpdeskapi = require('./lib/helpdeskapi'),
     libxmljs = require('libxmljs'),
 
@@ -64,51 +66,54 @@ function app() {
       // коллекция различных значений
       var options = mongoDb.collection('options');
 
-      // Uri для получения небольшой порции "последних обновленных" задач
-      var smallLimitUri = config.helpdesk.getTasks.uri.replace('{limit}', config.helpdesk.getTasks.smallLimit);
-      var bigLimitUri = config.helpdesk.getTasks.uri.replace('{limit}', config.helpdesk.getTasks.bigLimit);
-
       // запускаем получение задач
-      var getTasks = function(tasksUri, checkDelay) {
+      var getTasks = function(checkDelay) {
         setTimeout(function(){
+          // Uri для получения небольшой порции "последних обновленных" задач
+          var tasksUri = config.helpdesk.getTasks.uri.replace('{limit}', config.helpdesk.getTasks.maxLimit);
 
-          // TODO сделать механизм против сбоев сети/helpdesk
-          getData(tasksUri, function(data){
-
-            var tasksUpdateDates = [];
-
-            for(var i in data.Tasks) {
-              var task = data.Tasks[i];
-              task.ExecutorIds = task.ExecutorIds.split(",");
-              task.ExecutorIds = task.ExecutorIds.map(function (val) { return parseInt(val.trim()); });
-              task.ChangedUTC = Date.parse(task.Changed);
-
-              tasksUpdateDates.push(task.ChangedUTC);
-
-
-              task.HDStartTime = parseDateBegin(task);
-
-              tasks.update({Id: task.Id}, {
-                $currentDate: {
-                  lastModified: true,
-                  "HDTaskUpdate": { $type: "timestamp" }
-                }, $set: task
-              }, {upsert: true, multi: false});
+          var cursor = tasks.find({}, {Changed: 1}).sort({Changed: -1}).limit(1);
+          cursor.toArray(function(err, task){
+            assert.equal(null, err);
+            if(task.length == 0) {
+              tasksUri = tasksUri.replace('{filter}', '');
+            } else {
+              tasksUri = tasksUri.replace('{filter}', '&ChangedMoreThan=' + task[0]['Changed'].substr(0, 19).replace('T', '+'));
             }
 
-            // TODO: сделать проверку: если самая старая заявка не была обновлена с прошлого раза - продолжаем получать маленькими порциями
-            // иначе - "мы взяли слишком мало", и делаем "большое получение"
-            // получаем самую старую заявку из этой порции данных
-            // console.log(Date.now() - Math.min.apply(null, tasksUpdateDates));
+            getData(tasksUri, function(data){
 
-            console.log('getTasks');
-            getTasks(smallLimitUri, config.helpdesk.getTasks.checkDelay);
+              for(var i in data.Tasks) {
+                var task = data.Tasks[i];
+                task.ExecutorIds = task.ExecutorIds.split(",");
+                task.ExecutorIds = task.ExecutorIds.map(function (val) { return parseInt(val.trim()); });
+                task.ChangedUTC = Date.parse(task.Changed);
+
+                task.HDStartTime = parseDateBegin(task);
+                task.checkExp = 1;
+
+                tasks.update({Id: task.Id}, {
+                  $currentDate: {
+                    lastModified: true,
+                    "HDTaskUpdate": { $type: "timestamp" }
+                  }, $set: task
+                }, {upsert: true, multi: false});
+              }
+
+              // console.log('getTasks');
+              getTasks(config.helpdesk.getTasks.checkDelay);
+            });
+
           });
+
+
+
+
         }, checkDelay);
       }
 
       // сначала запускаем на небольшой порции, если не удастся получить все - то на большой
-      if(config.helpdesk.getTasks.active == 1) getTasks(smallLimitUri, 0);
+      if(config.helpdesk.getTasks.active == 1) getTasks(0);
 
       // запускаем получение пользователей
       var getUsers = function(usersUri, checkDelay) {
@@ -125,7 +130,7 @@ function app() {
               }, {upsert: true, multi: false});
             }
 
-            console.log('getUsers');
+            // console.log('getUsers');
             getUsers(usersUri, config.helpdesk.getUsers.checkDelay);
           });
 
@@ -136,19 +141,11 @@ function app() {
       if(config.helpdesk.getUsers.active == 1) getUsers(config.helpdesk.getUsers.uri, 0);
 
 
-
-      // TODO переделать на события обновления заявки (например, взводить флаг "обновить трудозатраты")
-      // сейчас же каждый раз просто дергаются последние заявки
-
       var getExpenses = function(checkDelay) {
         setTimeout(function(){
 
-          // Обновляем все недавно измененные
-          var cursor = tasks.find({}).sort({Changed: -1}).limit(20); // {Id: 116080}
-
-          // Могут быть "пропуски", поэтому периодически надо "обновлять все", но планомерно
-          // TODO критерии, например "все открытые" + "закрытые недавно"
-          // var cursor = tasks.find({}).sort({HDExpUpdate: 1}).limit(10); // {Id: 116080}
+          // Обновляем все недавно измененные, переданные из getTasks с флагом checkExp = 1
+          var cursor = tasks.find({checkExp: 1}).sort({Changed: -1}).limit(20);
 
           cursor.each(function(err, task){
             if(task == null) {
@@ -156,9 +153,8 @@ function app() {
             } else {
               var uri = config.helpdesk.getExpenses.uri.replace('{taskid}', task.Id);
               getData(uri, function (data) {
-                console.log(data);
                 if(data !== null) {
-                    var Expenses = {Expenses: data.Expenses};
+                    var Expenses = {checkExp: 0, Expenses: data.Expenses};
                     tasks.update({Id: task.Id}, {
                       $currentDate: {
                         lastModified: true,
@@ -173,7 +169,7 @@ function app() {
             }
           });
 
-          console.log('getExpenses');
+          // console.log('getExpenses');
           getExpenses(config.helpdesk.getExpenses.checkDelay);
 
         }, checkDelay);
