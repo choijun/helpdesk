@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd "$(dirname "$0")"
+
 # Запуск всех служб для докера
 
 if [ "$1" == "docker" ]; then
