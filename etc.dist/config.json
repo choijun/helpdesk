@@ -1,20 +1,28 @@
 {
   "helpdesk": {
+    "users": ["335", "11349", "11184", "2342", "10029", "325", "8960", "5842", "6515", "331", "11273", "6548", "11524", "14195", "10123"],
     "getTasks": {
       "active": "1",
-      "uri": "http://helpdesk:80/api/task?filterid=475&page=1&sort=Changed%20desc&pagesize={limit}",
-      "checkDelay" : "10000",
-      "maxLimit": "20"
+      "uri": "http://helpdesk:80/api/task",
+      "fullReindex": "1",
+      "fullReindexLimit": "10",
+      "deltaCheckDelay" : "10000",
+      "deltaLimit": "20",
+      "traceUri": "0"
     },
     "getExpenses": {
       "active": "1",
-      "uri": "http://helpdesk:80/api/taskexpenses?taskid={taskid}&pagesize=100&page=1",
-      "checkDelay": "10000"
+      "uri": "http://helpdesk:80/api/taskexpenses",
+      "checkDelay": "10000",
+      "traceUri": "0"
     },
     "getUsers": {
       "active": "1",
-      "uri": "http://helpdesk:80/api/user?pagesize=5000&page=1",
-      "checkDelay": "3600000"
+      "uri": "http://helpdesk:80/api/user",
+      "fullReindex": "0",
+      "checkDelay": "3600000",
+      "limit": "50",
+      "traceUri": "0"
     },
     "taskUri": "http://helpdesk/Task/View/{taskid}"
   },
