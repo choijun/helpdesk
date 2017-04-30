@@ -12,8 +12,10 @@ var express = require('express'),
     emitter = new EventEmitter(),
 
     assert = require('assert'),
+    path = require('path'),
 
-    config = require('../etc/config.json')
+    config = require('../etc/config.json'),
+    statPath = path.resolve(__dirname, '../public_html')
     ;
 
 var mongoDb;
@@ -63,7 +65,7 @@ app.get('/report.json', function(req, res) {
           $gte: req.query.start + 'T00:00:00',
           $lte: req.query.end + 'T23:59:59'
         }
-      },
+      }
     }
   };
 
@@ -135,8 +137,102 @@ app.get('/users.json', function(req, res) {
   });
 });
 
-initApp();
+app.get('/created-closed.json', function(req, res) {
+  var emitter = new EventEmitter();
+  var tasks = mongoDb.collection('tasks');
+  var data = [];
+
+  emitter.on('response', function(){
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(data));
+  });
+
+  var cursorClosed = tasks.find({Closed: {$ne: null}}, {Id: 1, Closed: 1});
+  cursorClosed.toArray(function(err, tasksClosed){
+    for(var i in tasksClosed) {
+      var task = tasksClosed[i];
+      data.push(
+        {Id: task.Id, timestamp: task.Closed, type: "Closed"}
+      );
+    }
+
+    var cursorCreated = tasks.find({Created: {$ne: null}}, {Id: 1, Created: 1});
+
+    cursorCreated.toArray(function(err, tasksCreated){
+      for(var i in tasksCreated) {
+        var task = tasksCreated[i];
+        data.push(
+          {Id: task.Id, timestamp: task.Created, type: "Created"}
+        );
+      }
+      emitter.emit('response');
+    });
+
+  });
+
+
+});
+
+
+
+app.get('/timeline.json', function(req, res) {
+  var emitter = new EventEmitter();
+  var tasks = mongoDb.collection('tasks');
+  var events = [];
+
+  emitter.on('response', function(){
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(events));
+  });
+
+  var ExecutorId = 11184;
+  var filter = {
+    Expenses: {
+      $elemMatch: {
+        UserId: ExecutorId,
+      }
+    }
+  };
+
+  var cursor = tasks.find(filter, {Id: 1, Name: 1, Created: 1, Closed: 1});
+
+  cursor.toArray(function(err, tasksData){
+    var nowDate = new Date();
+    for(var i in tasksData) {
+      var task = tasksData[i];
+      var dates = [];
+      dates.push(task.Created);
+      if(task.Closed) {
+        dates.push(task.Closed);
+      } else {
+        dates.push(nowDate);
+      }
+
+      events.push(
+        {dates: dates, title: task.Name}
+      );
+    }
+    emitter.emit('response');
+  });
+
+
+
+
+});
 
 // Статика
-app.use(express.static('public_html'));
+app.use(express.static(statPath, {fallthrough: false}));
+
+
+app.use(function(err, req, res, next){
+  if (err.statusCode == 404) {
+    res.sendFile('404.html', {root: statPath});
+  } else {
+    next(err);
+  }
+});
+
+
+// Запуск
+initApp();
 app.listen(config.web.port);

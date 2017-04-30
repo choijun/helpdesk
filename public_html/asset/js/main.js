@@ -293,7 +293,7 @@
     });
 
     $('.mail-wrapper').find('.mail-left').css('height', $('.mail-wrapper').innerHeight());
-    $("#left-menu ul li a").ripple();
+    $("#left-menu ul li a:not(.js-noripple)").ripple();
     $(".ripple div").ripple();
     $("#carousel-example3").carouselAnimate();
     $("#left-menu .sub-left-menu").niceScroll();

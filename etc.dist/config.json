@@ -2,7 +2,7 @@
   "helpdesk": {
     "getTasks": {
       "active": "1",
-      "uri": "http://helpdesk:80/api/task?filterid=398&page=1&sort=Changed%20desc&pagesize={limit}",
+      "uri": "http://helpdesk:80/api/task?filterid=475&page=1&sort=Changed%20desc&pagesize={limit}",
       "checkDelay" : "10000",
       "maxLimit": "20"
     },
