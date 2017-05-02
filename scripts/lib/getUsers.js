@@ -3,6 +3,7 @@
 var
   EventEmitter = require('events'),
   emitter = new EventEmitter(),
+  assert = require('assert'),
 
   config, mongoDb, getData, users;
 
@@ -28,7 +29,8 @@ emitter.on('paginationUri', function(settings){
   var usersUri = settings.uri.replace('{page}', settings.page);
   if(config.traceUri == 1) console.log(usersUri);
 
-  getData(usersUri, function(data){
+  getData(usersUri, function(err, data){
+    assert.equal(null, err);
     for(var i in data.Users) {
       var user = data.Users[i];
 

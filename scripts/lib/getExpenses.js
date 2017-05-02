@@ -22,8 +22,10 @@ function run() {
 
 emitter.on('getExp', function(){
 
-  // Обновляем все недавно измененные, переданные из getTasks с флагом checkExp = 1
-  var cursor = tasks.find({checkExp: 1}).sort({Changed: -1}).limit(1);
+  // Обновляем задачи, переданные из getTasks с флагом checkExp = 1, начиная со старых
+  // (иначе при переиндексации getTasks будет браться одна и та же задача)
+
+  var cursor = tasks.find({checkExp: 1}).sort({Changed: 1}).limit(1);
 
   cursor.toArray(function(err, task){
     assert.equal(null, err);
@@ -39,17 +41,29 @@ emitter.on('getExp', function(){
     var expensesUri = config.uri + '?taskid=' + task[0].Id + '&pagesize=100&page=1';
     if(config.traceUri == 1) console.log(expensesUri);
 
-    getData(expensesUri, function (data) {
-      if(data !== null) {
+    getData(expensesUri, function (err, data) {
+      switch(true) {
+        // нормальный случай, данные есть
+        case err === null && data !== null:
           var Expenses = {checkExp: 0, Expenses: data.Expenses};
-          tasks.update({Id: task[0].Id}, {
-            $currentDate: {
-              lastModified: true,
-              "HDExpUpdate": { $type: "timestamp" }
-            },
-            $set: Expenses
-          });
+          break;
+        // удален или нет прав (снимаем флаг)
+        case err !== null && err.statusCode == 400:
+          var Expenses = {checkExp: 0};
+          break;
+        // нет данных
+        default:
+          var Expenses = {checkExp: 0};
       }
+
+      tasks.update({Id: task[0].Id}, {
+        $currentDate: {
+          lastModified: true,
+          "HDExpUpdate": { $type: "timestamp" }
+        },
+        $set: Expenses
+      });
+
       emitter.emit('getExp');
     });
 

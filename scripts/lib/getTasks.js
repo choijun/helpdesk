@@ -4,6 +4,7 @@ var
   EventEmitter = require('events'),
   emitter = new EventEmitter(),
   assert = require('assert'),
+
   libxmljs = require('libxmljs'),
 
   config, usersServed, mongoDb, getData, tasks;
@@ -31,7 +32,8 @@ emitter.on('paginationUri', function(settings){
   var tasksUri = settings.uri.replace('{page}', settings.page);
   if(config.traceUri == 1) console.log(tasksUri);
 
-  getData(tasksUri, function(data){
+  getData(tasksUri, function(err, data){
+    assert.equal(null, err);
     for(var i in data.Tasks) {
       var task = data.Tasks[i];
       task.ExecutorIds = task.ExecutorIds.split(",");

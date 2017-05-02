@@ -34,13 +34,18 @@ function connect() {
 
 function getData(uri, callback) {
   httpreq.get(uri, options, function(err, res) {
-    assert.equal(null, err);
-    if(res.statusCode === 400) {
-      callback(null); // удален
+    if (err !== null) {
+      callback(err, null)
+    }
+
+    if(res.statusCode !== 200) {
+      err = new Error('Error response code: ' + res.statusCode);
+      err.statusCode = res.statusCode;
+      callback(err, null);
       return;
     }
-    assert.equal(200, res.statusCode);
-    callback(JSON.parse(res.body));
+
+    callback(null, JSON.parse(res.body));
   });
 }
 
