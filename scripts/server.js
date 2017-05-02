@@ -187,11 +187,10 @@ app.get('/timeline.json', function(req, res) {
 
   var ExecutorId = 11184;
   var filter = {
-    Expenses: {
-      $elemMatch: {
-        UserId: ExecutorId,
-      }
-    }
+    $or: [
+      { Expenses: { $elemMatch: { UserId: ExecutorId } } },
+      { ExecutorIds: ExecutorId }
+    ]
   };
 
   var cursor = tasks.find(filter, {Id: 1, Name: 1, Created: 1, Closed: 1});
@@ -209,7 +208,8 @@ app.get('/timeline.json', function(req, res) {
       }
 
       events.push(
-        {dates: dates, title: task.Name}
+        // link, attrs, title, section
+        {dates: dates, title: "[" + task.Id + "] " + task.Name}
       );
     }
     emitter.emit('response');

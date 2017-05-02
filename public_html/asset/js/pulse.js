@@ -10,7 +10,7 @@
       $('#target1').html('<li>Упс, данные не получены</li>');
     },
     success: function(events) {
-      console.log(events);
+      // console.log(events);
 
       var timeline = new Chronoline(document.getElementById("target1"), events,
         {
