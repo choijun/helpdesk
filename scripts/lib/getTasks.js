@@ -42,6 +42,7 @@ emitter.on('paginationUri', function(settings){
 
       task.HDStartTime = parseDateBegin(task);
       task.checkExp = 1;
+      task.checkLife = 1;
 
       tasks.update({Id: task.Id}, {
         $currentDate: {

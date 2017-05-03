@@ -137,6 +137,7 @@ app.get('/users.json', function(req, res) {
   });
 });
 
+// Время заявки: открыта, закрыта (закрыта != выполнена)
 app.get('/created-closed.json', function(req, res) {
   var emitter = new EventEmitter();
   var tasks = mongoDb.collection('tasks');
@@ -173,8 +174,7 @@ app.get('/created-closed.json', function(req, res) {
 
 });
 
-
-
+// "время жизни заявки"
 app.get('/timeline.json', function(req, res) {
   var emitter = new EventEmitter();
   var tasks = mongoDb.collection('tasks');
@@ -215,10 +215,51 @@ app.get('/timeline.json', function(req, res) {
     emitter.emit('response');
   });
 
+});
 
 
+/*
+db.tasks.find({Lifetime: {$elemMatch: {StatusId: 29}}}, {Lifetime: {$elemMatch: {StatusId: 29}}})
+
+*/
+app.get('/tasks-completed.json', function(req, res) {
+  var emitter = new EventEmitter();
+  var tasks = mongoDb.collection('tasks');
+  var events = [];
+
+  emitter.on('response', function(){
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(events));
+  });
+
+  var ExecutorId = 11184;
+  var statusCompleted = 29;
+  var filter = {
+    $or: [
+      { Expenses: { $elemMatch: { UserId: ExecutorId } } },
+      { ExecutorIds: ExecutorId }
+    ],
+    Lifetime: {$elemMatch: {StatusId: statusCompleted}}
+  };
+
+
+  var cursor = tasks.find(filter, {Id: 1, Name: 1, Lifetime: {$elemMatch: {StatusId: 29}}});
+
+  cursor.toArray(function(err, tasksData){
+
+    for(var i in tasksData) {
+      var task = tasksData[i];
+      events.push(
+        // link, attrs, title, section
+        {date: task.Lifetime[0].Date, count: 1}
+      );
+    }
+    emitter.emit('response');
+  });
 
 });
+
+
 
 // Статика
 app.use(express.static(statPath, {fallthrough: false}));

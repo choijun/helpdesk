@@ -16,6 +16,12 @@
       "checkDelay": "10000",
       "traceUri": "0"
     },
+    "getLifetime": {
+      "active": "1",
+      "uri": "http://helpdesk/api/tasklifetime",
+      "checkDelay": "10000",
+      "traceUri": "0"
+    },
     "getUsers": {
       "active": "1",
       "uri": "http://helpdesk:80/api/user",

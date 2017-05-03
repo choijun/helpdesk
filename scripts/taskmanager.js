@@ -80,6 +80,10 @@ function app() {
       getExpenses.init({config: config.helpdesk.getExpenses, mongoDb: mongoDb, getData: getData});
       getExpenses.run();
 
+      // получение жизненного цикла заявки
+      var getLifetime = require('./lib/getLifetime');
+      getLifetime.init({config: config.helpdesk.getLifetime, mongoDb: mongoDb, getData: getData});
+      getLifetime.run();
 
     }
   });
