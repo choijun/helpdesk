@@ -225,7 +225,7 @@ db.tasks.find({Lifetime: {$elemMatch: {StatusId: 29}}}, {Lifetime: {$elemMatch: 
 app.get('/tasks-completed.json', function(req, res) {
   var emitter = new EventEmitter();
   var tasks = mongoDb.collection('tasks');
-  var events = [];
+  var eventsObj = {}, events = [];
 
   emitter.on('response', function(){
     res.setHeader('Content-Type', 'application/json');
@@ -243,17 +243,34 @@ app.get('/tasks-completed.json', function(req, res) {
   };
 
 
-  var cursor = tasks.find(filter, {Id: 1, Name: 1, Lifetime: {$elemMatch: {StatusId: 29}}});
+  var cursor = tasks.find(filter, {Id: 1, Name: 1, Lifetime: {$elemMatch: {StatusId: statusCompleted}}}).limit(50).sort({});
 
   cursor.toArray(function(err, tasksData){
 
+
     for(var i in tasksData) {
       var task = tasksData[i];
-      events.push(
-        // link, attrs, title, section
-        {date: task.Lifetime[0].Date, count: 1}
-      );
+
+      var date = new Date(task.Lifetime[0].Date);
+      date.setHours(0,0,0,0);
+      var dateKey = date.toDateString();
+      if(eventsObj[dateKey] === undefined) {
+        eventsObj[dateKey] = {date: date, count: 1}
+      } else {
+        eventsObj[dateKey]["count"]++;
+      }
     }
+
+
+    for(var i in eventsObj) {
+      events.push(eventsObj[i]);
+    }
+
+    events.sort(function(a, b){
+      if(a.date == b.date) return 0;
+      return a.date > b.date ? 1 : -1;
+    })
+
     emitter.emit('response');
   });
 
