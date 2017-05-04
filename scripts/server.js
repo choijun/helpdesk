@@ -69,8 +69,6 @@ app.get('/report.json', function(req, res) {
     }
   };
 
-  // console.log(JSON.stringify(filter, null, 4));
-
   var cursor = tasks.find(filter, {Created: 1, Creator: 1, Expenses: 1, ExecutorIds: 1, Name: 1, Id: 1, StatusId: 1, TypeId: 1});
 
   cursor.toArray(function(err, tasks){
@@ -225,25 +223,32 @@ db.tasks.find({Lifetime: {$elemMatch: {StatusId: 29}}}, {Lifetime: {$elemMatch: 
 app.get('/tasks-completed.json', function(req, res) {
   var emitter = new EventEmitter();
   var tasks = mongoDb.collection('tasks');
-  var eventsObj = {}, events = [];
+  var eventsObj = {}, response = {events: []};
+  var statusCompleted = 29;
+
+  var ExecutorId = parseInt(req.query.ExecutorId);
 
   emitter.on('response', function(){
     res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(events));
+    res.send(JSON.stringify(response));
   });
 
-  var ExecutorId = 11184;
-  var statusCompleted = 29;
+  // могут быть проблемы с високосным годом
+  var now = new Date();
+  now.setHours(0,0,0,0);
+  now.setFullYear(now.getFullYear() - 1);
+
   var filter = {
     $or: [
       { Expenses: { $elemMatch: { UserId: ExecutorId } } },
-      { ExecutorIds: ExecutorId }
+      { ExecutorIds: (ExecutorId > 0) ? ExecutorId : {$in: config.helpdesk.users.map(function(UserId){return Number(UserId);})} }
     ],
-    Lifetime: {$elemMatch: {StatusId: statusCompleted}}
+    Lifetime: {$elemMatch: {StatusId: statusCompleted, Date: {$gte: now.toJSON()}}}
   };
 
+  // console.log(JSON.stringify(filter));
 
-  var cursor = tasks.find(filter, {Id: 1, Name: 1, Lifetime: {$elemMatch: {StatusId: statusCompleted}}}).limit(50).sort({});
+  var cursor = tasks.find(filter, {Id: 1, Name: 1, Lifetime: {$elemMatch: {StatusId: statusCompleted}}});
 
   cursor.toArray(function(err, tasksData){
 
@@ -263,10 +268,11 @@ app.get('/tasks-completed.json', function(req, res) {
 
 
     for(var i in eventsObj) {
-      events.push(eventsObj[i]);
+      response.events.push(eventsObj[i]);
     }
 
-    events.sort(function(a, b){
+    // сортировка обязательна
+    response.events.sort(function(a, b){
       if(a.date == b.date) return 0;
       return a.date > b.date ? 1 : -1;
     })

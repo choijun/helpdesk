@@ -1,4 +1,3 @@
-var debugVar = [];
 function calendarHeatmap() {
   // defaults
   var width = 1364;
@@ -18,7 +17,7 @@ function calendarHeatmap() {
   var tooltipUnit = 'contribution';
   var legendEnabled = true;
   var onClick = null;
-  var weekStart = 1; //0 for Sunday, 1 for Monday
+  var weekStart = 0; //0 for Sunday, 1 for Monday - bug!
   var locale = {
     months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     days: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
@@ -274,7 +273,6 @@ function calendarHeatmap() {
     }).attr('fill', function (d, i) {
       var _count = chart.data()[i].count
       var _color = color(_count)
-      debugVar.push({count: _count, color: _color});
       return _color;
     });
   }
