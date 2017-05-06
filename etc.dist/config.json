@@ -32,6 +32,10 @@
     },
     "taskUri": "http://helpdesk/Task/View/{taskid}"
   },
+  "memcached": {
+    "active": "0",
+    "connection": "localhost:11211"
+  },
   "mongo": {
     "uri": "mongodb://localhost:27017/helpdesk",
     "dockerDB": "helpdesk"

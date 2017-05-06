@@ -8,6 +8,9 @@ var express = require('express'),
     MongoClient = _mongoDb.MongoClient,
     ObjectID = _mongoDb.ObjectID,
 
+    Memcached = require('memcached'),
+    memcached,
+
     EventEmitter = require('events'),
     emitter = new EventEmitter(),
 
@@ -40,6 +43,10 @@ function initApp() {
       process.exit(1);
     }
   );
+
+  if(config.memcached.active == 1) {
+    memcached = new Memcached(config.memcached.connection);
+  }
 }
 
 app.get('/report.json', function(req, res) {
@@ -227,58 +234,77 @@ app.get('/tasks-completed.json', function(req, res) {
   var statusCompleted = 29;
 
   var ExecutorId = parseInt(req.query.ExecutorId);
+  var memcachedKey = '/tasks-completed.json-' + ExecutorId;
 
   emitter.on('response', function(){
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify(response));
   });
 
-  // могут быть проблемы с високосным годом
-  var now = new Date();
-  now.setHours(0,0,0,0);
-  now.setFullYear(now.getFullYear() - 1);
-
-  var filter = {
-    $or: [
-      { Expenses: { $elemMatch: { UserId: ExecutorId } } },
-      { ExecutorIds: (ExecutorId > 0) ? ExecutorId : {$in: config.helpdesk.users.map(function(UserId){return Number(UserId);})} }
-    ],
-    Lifetime: {$elemMatch: {StatusId: statusCompleted, Date: {$gte: now.toJSON()}}}
-  };
-
-  // console.log(JSON.stringify(filter));
-
-  var cursor = tasks.find(filter, {Id: 1, Name: 1, Lifetime: {$elemMatch: {StatusId: statusCompleted}}});
-
-  cursor.toArray(function(err, tasksData){
-
-
-    for(var i in tasksData) {
-      var task = tasksData[i];
-
-      var date = new Date(task.Lifetime[0].Date);
-      date.setHours(0,0,0,0);
-      var dateKey = date.toDateString();
-      if(eventsObj[dateKey] === undefined) {
-        eventsObj[dateKey] = {date: date, count: 1}
+  if(config.memcached.active == 1) {
+    memcached.get(memcachedKey, function (err, data) {
+      if(data === undefined) {
+        getData();
       } else {
-        eventsObj[dateKey]["count"]++;
+        response = data;
+        emitter.emit('response');
       }
-    }
+    });
+  }
+
+  function getData() {
+    // могут быть проблемы с високосным годом - на клиенте есть баги в плагине
+    var now = new Date();
+    now.setHours(0,0,0,0);
+    now.setFullYear(now.getFullYear() - 1);
+
+    var filter = {
+      $or: [
+        { Expenses: { $elemMatch: { UserId: ExecutorId } } },
+        { ExecutorIds: (ExecutorId > 0) ? ExecutorId : {$in: config.helpdesk.users.map(function(UserId){return Number(UserId);})} }
+      ],
+      Lifetime: {$elemMatch: {StatusId: statusCompleted, Date: {$gte: now.toJSON()}}}
+    };
+
+    // console.log(JSON.stringify(filter));
+
+    var cursor = tasks.find(filter, {Id: 1, Name: 1, Lifetime: {$elemMatch: {StatusId: statusCompleted}}});
+
+    cursor.toArray(function(err, tasksData){
 
 
-    for(var i in eventsObj) {
-      response.events.push(eventsObj[i]);
-    }
+      for(var i in tasksData) {
+        var task = tasksData[i];
 
-    // сортировка обязательна
-    response.events.sort(function(a, b){
-      if(a.date == b.date) return 0;
-      return a.date > b.date ? 1 : -1;
-    })
+        var date = new Date(task.Lifetime[0].Date);
+        date.setHours(0,0,0,0);
+        var dateKey = date.toDateString();
+        if(eventsObj[dateKey] === undefined) {
+          eventsObj[dateKey] = {date: date, count: 1}
+        } else {
+          eventsObj[dateKey]["count"]++;
+        }
+      }
 
-    emitter.emit('response');
-  });
+
+      for(var i in eventsObj) {
+        response.events.push(eventsObj[i]);
+      }
+
+      // сортировка обязательна
+      response.events.sort(function(a, b){
+        if(a.date == b.date) return 0;
+        return a.date > b.date ? 1 : -1;
+      });
+
+      if(config.memcached.active == 1) {
+        memcached.set(memcachedKey, response, 43200, function (err) { /* stuff */ });
+      }
+
+      emitter.emit('response');
+    });
+
+  }
 
 });
 

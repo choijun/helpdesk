@@ -37,8 +37,8 @@
   $('body').on('users-loaded', function() {
     // console.log(users.Name);
     var delay = 0;
-    // for(var i in users) {
-    for(var i in {11273: 1, 11349: 1, 14195: 1, 11184: 1}) {
+    for(var i in users) {
+    // for(var i in {11273: 1, 11349: 1, 14195: 1, 11184: 1}) {
       // todo сделать "по цепочке"
       var user = users[i];
       $pulse.trigger('addReport', {prefix: 'pulse', user: user});
