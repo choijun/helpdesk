@@ -46,6 +46,11 @@
   });
 
   $pulse.on('addReport', function(e, settings){
+
+    var idAttr = settings.prefix + settings.user.Id;
+    var idAttrProgress = idAttr + 'progress';
+    $pulse.append('<h2>' + settings.user.Name + '</h2><div id="' + idAttr + '"><div id="' + idAttrProgress +'">Загрузка ...</div></div>');
+
     $.ajax({
       url: "tasks-completed.json?ExecutorId=" + settings.user.Id,
       method: 'GET',
@@ -55,8 +60,9 @@
         // $('#chart-one').html('<li>Упс, данные не получены</li>');
       },
       success: function(resp) {
-        var idAttr = settings.prefix + settings.user.Id;
-        $pulse.append('<h2>' + settings.user.Name + '</h2><div id="' + idAttr + '"></div>');
+
+
+
         for(var i in resp.events) {
           var ev = resp.events[i];
           ev.date = new Date(ev.date);
@@ -80,6 +86,7 @@
             // console.log('data', data);
           });
         heatmap();  // render the chart
+        $('#' + idAttrProgress).remove();
       }
     });
   });
