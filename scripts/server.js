@@ -250,6 +250,8 @@ app.get('/tasks-completed.json', function(req, res) {
         emitter.emit('response');
       }
     });
+  } else {
+    getData();
   }
 
   function getData() {
@@ -272,7 +274,6 @@ app.get('/tasks-completed.json', function(req, res) {
 
     cursor.toArray(function(err, tasksData){
 
-
       for(var i in tasksData) {
         var task = tasksData[i];
 
@@ -280,10 +281,10 @@ app.get('/tasks-completed.json', function(req, res) {
         date.setHours(0,0,0,0);
         var dateKey = date.toDateString();
         if(eventsObj[dateKey] === undefined) {
-          eventsObj[dateKey] = {date: date, count: 1}
-        } else {
-          eventsObj[dateKey]["count"]++;
+          eventsObj[dateKey] = {date: date, count: 0, ids: []};
         }
+        eventsObj[dateKey]["count"]++;
+        eventsObj[dateKey]["ids"].push(task.Id);
       }
 
 

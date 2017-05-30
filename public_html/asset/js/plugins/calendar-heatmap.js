@@ -14,7 +14,7 @@ function calendarHeatmap() {
   var max = null;
   var colorRange = ['#D8E6E7', '#218380'];
   var tooltipEnabled = true;
-  var tooltipUnit = 'contribution';
+  var tooltipUnit = 'задач';
   var legendEnabled = true;
   var onClick = null;
   var weekStart = 0; //0 for Sunday, 1 for Monday - bug!
@@ -136,8 +136,7 @@ function calendarHeatmap() {
 
       if (typeof onClick === 'function') {
         dayRects.on('click', function (d) {
-          var count = countForDate(d);
-          onClick({ date: d, count: count});
+          onClick({ date: d, data: dataForDate(d)});
         });
       }
 
@@ -222,7 +221,8 @@ function calendarHeatmap() {
     }
 
     function pluralizedTooltipUnit (count) {
-      if ('string' === typeof tooltipUnit) {
+      return tooltipUnit;
+      /*if ('string' === typeof tooltipUnit) {
         return (tooltipUnit + (count === 1 ? '' : 's'));
       }
       for (var i in tooltipUnit) {
@@ -233,11 +233,11 @@ function calendarHeatmap() {
         if (count >= _min && count <= _max) {
           return _rule.unit;
         }
-      }
+      }*/
     }
 
     function tooltipHTMLForDate(d) {
-      var dateStr = moment(d).format('ddd, MMM Do YYYY');
+      var dateStr = moment(d).format('MMM Do YYYY (ddd)');
       var count = countForDate(d);
       return '<span><strong>' + (count ? count : locale.No) + ' ' + pluralizedTooltipUnit(count) + '</strong> ' + locale.on + ' ' + dateStr + '</span>';
     }
@@ -251,6 +251,17 @@ function calendarHeatmap() {
         count = match.count;
       }
       return count;
+    }
+
+    function dataForDate(d) {
+      var data = null;
+      var match = chart.data().find(function (element, index) {
+        return moment(element.date).isSame(d, 'day');
+      });
+      if (match) {
+        data = match;
+      }
+      return data;
     }
 
     function formatWeekday(weekDay) {

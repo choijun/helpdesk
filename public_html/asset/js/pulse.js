@@ -38,7 +38,7 @@
     // console.log(users.Name);
     var delay = 0;
     for(var i in users) {
-    // for(var i in {11273: 1, 11349: 1, 14195: 1, 11184: 1}) {
+    // for(var i in {11184: 1}) {
       // todo сделать "по цепочке"
       var user = users[i];
       $pulse.trigger('addReport', {prefix: 'pulse', user: user});
@@ -61,8 +61,6 @@
       },
       success: function(resp) {
 
-
-
         for(var i in resp.events) {
           var ev = resp.events[i];
           ev.date = new Date(ev.date);
@@ -73,7 +71,6 @@
           .legendEnabled(false)
           .tooltipEnabled(true)
           .colorRange(['#F6F8F8', '#2196F3'])
-          .tooltipUnit('task')
           .locale({
               months: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сент', 'Окт', 'Нояб', 'Дек'],
               days: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
@@ -81,9 +78,11 @@
               on: '',
               Less: 'мало',
               More: 'много'
-        })
-          .onClick(function (data) {
-            // console.log('data', data);
+          })
+          .onClick(function (day) {
+            if(day.data) {
+              alert('Номера задач: ' + day.data.ids.join(', '));
+            }
           });
         heatmap();  // render the chart
         $('#' + idAttrProgress).remove();
