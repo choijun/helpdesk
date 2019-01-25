@@ -43,7 +43,12 @@
   "telegram": {
     "active": "0",
     "token": "your_bot:token",
-    "checkDelay": "5000"
+    "checkDelay": "5000",
+    "chat": {
+      "report": {
+        "operativeDefaultHours": "2"
+      }
+    }
   },
   "web": {
     "port": "8080"

@@ -13,7 +13,7 @@ fi
 pm2 start scripts/server.js
 
 # Запуск клиента телеграммы
-pm2 start scripts/telegram.js
+# pm2 start scripts/telegram.js
 
 # Запуск менеджера задач
 pm2 start scripts/taskmanager.js
