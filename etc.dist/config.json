@@ -22,7 +22,7 @@
     "uri": "http://helpdesk.iek.local:80/api/task",
     "limit": "50",
     "deltaLimit": "20",
-    "deltaCheckDelay" : "10000"
+    "checkDelay" : "10000"
   },
 
   "TaskExpense": {
