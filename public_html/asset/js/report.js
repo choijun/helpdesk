@@ -42,7 +42,7 @@
     $('body').on('click', '.js-changeuser', function(e){
       var state = {userID: $(this).attr('data-id')};
       $calendar.trigger('change-user', state);
-      history.pushState(state, '', 'calendar.html?ExecutorId=' + state.userID);
+      history.pushState(state, '', 'index.html?ExecutorId=' + state.userID);
     });
 
     $calendar.on('change-user', function(event, state){

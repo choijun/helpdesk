@@ -11,16 +11,12 @@
     "body-parser": "^1.16.1",
     "express": "^4.14.1",
     "httpntlm": "^1.7.3",
-    "libxmljs": "^0.18.4",
-    "memcached": "^2.2.2",
+    "log4js": "^4.0.0",
     "mongodb": "^2.2.22",
-    "node-telegram-bot-api": "^0.27.0"
+    "xmldom": "^0.1.27",
+    "xpath": "0.0.27"
   },
   "devDependencies": {},
-  "scripts": {
-    "install": "node scripts/install-npm.js",
-    "start": "/bin/bash start.sh"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/dbfun/helpdesk.git"

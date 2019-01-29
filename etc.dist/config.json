@@ -1,58 +1,55 @@
 {
+  "HelpDeskApi": {
+    "url": "http://helpdesk.iek.local:80//winauth",
+    "username": "username",
+    "password": "password",
+    "workstation": "",
+    "domain": ""
+  },
+
+  "User": {
+    "enabled": "1",
+    "reindex": "0",
+    "uri": "http://helpdesk.iek.local:80/api/user",
+    "limit": "50",
+    "checkDelay": "3600000",
+    "active": ["335", "11349", "11184", "2342", "10029", "325", "8960", "5842", "6515", "331", "11273", "6548", "11524", "14195", "10123", "15852", "14422"]
+  },
+
+  "Task": {
+    "enabled": "1",
+    "reindex": "0",
+    "uri": "http://helpdesk.iek.local:80/api/task",
+    "limit": "50",
+    "deltaLimit": "20",
+    "deltaCheckDelay" : "10000"
+  },
+
+  "TaskExpense": {
+    "enabled": "1",
+    "uri": "http://helpdesk.iek.local:80/api/taskexpenses",
+    "checkDelay": "10000"
+  },
+
+  "TaskLifetime": {
+    "enabled": "1",
+    "uri": "http://helpdesk.iek.local:80/api/tasklifetime",
+    "checkDelay": "10000"
+  },
+
   "helpdesk": {
-    "users": ["335", "11349", "11184", "2342", "10029", "325", "8960", "5842", "6515", "331", "11273", "6548", "11524", "14195", "10123"],
-    "getTasks": {
-      "active": "1",
-      "uri": "http://helpdesk:80/api/task",
-      "fullReindex": "1",
-      "fullReindexLimit": "10",
-      "deltaCheckDelay" : "10000",
-      "deltaLimit": "20",
-      "traceUri": "0"
-    },
-    "getExpenses": {
-      "active": "1",
-      "uri": "http://helpdesk:80/api/taskexpenses",
-      "checkDelay": "10000",
-      "traceUri": "0"
-    },
-    "getLifetime": {
-      "active": "1",
-      "uri": "http://helpdesk/api/tasklifetime",
-      "checkDelay": "10000",
-      "traceUri": "0"
-    },
-    "getUsers": {
-      "active": "1",
-      "uri": "http://helpdesk:80/api/user",
-      "fullReindex": "0",
-      "checkDelay": "3600000",
-      "limit": "50",
-      "traceUri": "0"
-    },
-    "taskUri": "http://helpdesk/Task/View/{taskid}"
+    "taskUri": "http://helpdesk.iek.local/Task/View/{taskid}"
   },
-  "memcached": {
-    "active": "0",
-    "connection": "localhost:11211"
-  },
+
   "mongo": {
-    "uri": "mongodb://localhost:27017/helpdesk",
+    "uri": "mongodb://mongo:27017/helpdesk",
     "dockerDB": "helpdesk"
   },
-  "telegram": {
-    "active": "0",
-    "token": "your_bot:token",
-    "checkDelay": "5000",
-    "chat": {
-      "report": {
-        "operativeDefaultHours": "2"
-      }
-    }
-  },
+
   "web": {
-    "port": "8080"
+    "port": "80"
   },
+
   "report": {
     "users": {
       "335": {"photo": "asset/users/335.jpg"},
@@ -69,14 +66,10 @@
       "6548": {"photo": "asset/users/6548.jpg"},
       "11524": {"photo": "asset/users/11524.jpg"},
       "14195": {"photo": "asset/users/14195.jpg"},
-      "10123": {"photo": "asset/users/10123.jpg"}
+      "10123": {"photo": "asset/users/10123.jpg"},
+      "15852": {"photo": "asset/users/15852.jpg"},
+      "14422": {"photo": "asset/users/d75787688ecfecd2db9472fe00e5a37b.jpg"}
     }
-  },
-  "ntlmOptions": {
-    "url": "http://helpdesk:80//winauth",
-    "username": "username",
-    "password": "password",
-    "workstation": "",
-    "domain": ""
   }
+
 }
